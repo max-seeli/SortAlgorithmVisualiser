@@ -8,10 +8,12 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.project.sortvisualisations.SortArray;
+
 public class DataGraph extends View {
 
-    private int[] values;
-    private boolean[] highlighted;
+    private SortArray array;
+
     private int viewWidth;
     private int viewHeight;
 
@@ -31,9 +33,8 @@ public class DataGraph extends View {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
-    public void setData(int[] data, boolean[] highlighted) {
-        values = data;
-        this.highlighted = highlighted;
+    public void setData(SortArray data) {
+        this.array = data;
     }
 
     @Override
@@ -46,11 +47,10 @@ public class DataGraph extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        for (int i = 0; i < values.length; i++) {
+        for (int i = 0; i < array.getSize(); i++) {
             drawElement(canvas, i);
         }
         super.onDraw(canvas);
-        invalidate();
     }
 
     private void drawElement(Canvas canvas, int index) {
@@ -61,10 +61,10 @@ public class DataGraph extends View {
     }
 
     private Rect getRect(int index) {
-        int barWidth = (viewWidth - values.length) / values.length;
+        int barWidth = (viewWidth - array.getSize()) / array.getSize();
 
         Rect rect = new Rect();
-        rect.top = viewHeight - (values[index] * (viewHeight / values.length));
+        rect.top = viewHeight - (array.getValue(index) * (viewHeight / array.getSize()));
         rect.left = index * barWidth + index;
         rect.bottom = viewHeight;
         rect.right = index * barWidth + barWidth + index;
@@ -72,13 +72,13 @@ public class DataGraph extends View {
     }
 
     private Paint getColor(int index) {
-        boolean hl = highlighted[index];
-        Paint p = new Paint();
-        if (hl) {
-            p.setColor(Color.RED);
+        boolean isHighlighted = array.isHighlighted(index);
+        Paint color = new Paint();
+        if (isHighlighted) {
+            color.setColor(Color.RED);
         } else {
-            p.setColor(Color.DKGRAY);
+            color.setColor(Color.DKGRAY);
         }
-        return p;
+        return color;
     }
 }

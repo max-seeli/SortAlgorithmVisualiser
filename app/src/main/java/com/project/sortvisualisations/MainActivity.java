@@ -1,11 +1,10 @@
 package com.project.sortvisualisations;
 
+import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
-import android.os.Bundle;
-
-import java.sql.Time;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -15,6 +14,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         final SortVisualisationFragment visualisationFragment = SortVisualisationFragment.getSortVisualisationFragmentInstance(200, 0);
         FragmentManager fm = getSupportFragmentManager();

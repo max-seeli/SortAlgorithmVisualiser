@@ -1,12 +1,8 @@
 package com.project.sortvisualisations;
 
-import android.view.View;
-
 import com.project.sortvisualisations.Algorithms.SortAlgorithm;
 import com.project.sortvisualisations.Algorithms.SortAlgorithmFactory;
-import com.project.sortvisualisations.CustomView.DataGraph;
 
-import java.util.Collections;
 import java.util.Random;
 
 public class SortArray {
@@ -17,7 +13,7 @@ public class SortArray {
 
     private SortAlgorithm algorithm;
 
-    private View dispalyingView;
+    private SortVisualisationFragment displayingView;
 
     public SortArray(int elementCount, int algorithmIndex) {
         array = new int[elementCount];
@@ -35,7 +31,14 @@ public class SortArray {
         }
     }
 
+    public void resetBarHighlight() {
+        for (int i = 0; i < arrayHighlighted.length; i++) {
+            arrayHighlighted[i] = false;
+        }
+    }
+
     public void shuffle() {
+        displayingView.setAlgorithmName("Shuffling...");
         arrayChanges = 0;
         Random rng = new Random();
         for (int i = 0; i < array.length; i++) {
@@ -47,17 +50,9 @@ public class SortArray {
     }
 
     public void sort() {
+        displayingView.setAlgorithmName(algorithm.getAlgorithmName());
+        displayingView.setAlgorithmDelay(algorithm.getAlgorithmDelay());
         algorithm.runSort(this);
-    }
-
-    private void finaliseChange(long delay, boolean isStep) {
-        dispalyingView.invalidate();
-        try {
-            Thread.sleep(delay);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        if (isStep) arrayChanges++;
     }
 
     public void swap(int firstIndex, int secondIndex, long millisecondDelay, boolean isStep) {
@@ -69,23 +64,26 @@ public class SortArray {
         arrayHighlighted[firstIndex] = true;
         arrayHighlighted[secondIndex] = true;
 
-        finaliseChange(millisecondDelay, isStep);
+        finalizeChange(millisecondDelay, isStep);
     }
 
     public void updateSingle(int index, int value, long millisecondDelay, boolean isStep) {
         array[index] = value;
         arrayHighlighted[index] = true;
 
-        finaliseChange(millisecondDelay, isStep);
+        finalizeChange(millisecondDelay, isStep);
     }
 
-    public void highlight(int index) {
-        arrayHighlighted[index] = true;
-    }
-
-    public void resetBarHighlight() {
-        for (int i = 0; i < arrayHighlighted.length; i++) {
-            arrayHighlighted[i] = false;
+    private void finalizeChange(long delay, boolean isStep) {
+        displayingView.invalidate();
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        if (isStep) {
+            arrayChanges++;
+            displayingView.setSteps(arrayChanges);
         }
     }
 
@@ -97,23 +95,11 @@ public class SortArray {
         return array[index];
     }
 
-    public String getAlgorithmName() {
-        return algorithm.getAlgorithmName();
+    public boolean isHighlighted(int index) {
+        return arrayHighlighted[index];
     }
 
-    public int getAlgorithmDelay() {
-        return algorithm.getAlgorithmDelay();
-    }
-
-    public int[] getArray() {
-        return array;
-    }
-
-    public boolean[] getArrayHighlighted() {
-        return arrayHighlighted;
-    }
-
-    public void setDisplayingView(DataGraph displayingView) {
-        this.dispalyingView = displayingView;
+    public void setDisplayingFragment(SortVisualisationFragment displayingView) {
+        this.displayingView = displayingView;
     }
 }

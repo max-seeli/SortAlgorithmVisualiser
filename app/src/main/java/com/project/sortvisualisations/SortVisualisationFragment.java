@@ -1,21 +1,15 @@
 package com.project.sortvisualisations;
 
-import android.content.Context;
 import android.os.Bundle;
-
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.project.sortvisualisations.CustomView.DataGraph;
+import androidx.fragment.app.Fragment;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import com.project.sortvisualisations.CustomView.DataGraph;
 
 public class SortVisualisationFragment extends Fragment {
 
@@ -23,6 +17,11 @@ public class SortVisualisationFragment extends Fragment {
     private static final String SORT_ALGORITHM = "index number of Sort Algorithm";
 
     private static final String INVALID_ARGUMENT_TAG = "INVALID ARGUMENT -> NullPointerException";
+
+    private TextView algorithmName;
+    private TextView stepsText;
+    private TextView algorithmDelay;
+    private DataGraph dataGraphView;
 
     private SortArray sortArray;
 
@@ -47,15 +46,14 @@ public class SortVisualisationFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View layout =  inflater.inflate(R.layout.fragment_sort_visualisation, container, false);
-        TextView algorithmName = (TextView) layout.findViewById(R.id.algorithm_name);
-        TextView algorithmDelay = (TextView) layout.findViewById(R.id.algorithm_delay);
-        final DataGraph dataGraphView = (DataGraph) layout.findViewById(R.id.data_graph_view);
 
-        algorithmName.append(sortArray.getAlgorithmName());
-        algorithmDelay.append(String.valueOf(sortArray.getAlgorithmDelay()));
+        algorithmName = (TextView) layout.findViewById(R.id.algorithm_name);
+        stepsText = (TextView) layout.findViewById(R.id.step_count);
+        algorithmDelay = (TextView) layout.findViewById(R.id.algorithm_delay);
+        dataGraphView = (DataGraph) layout.findViewById(R.id.data_graph_view);
 
-        dataGraphView.setData(sortArray.getArray(), sortArray.getArrayHighlighted());
-        sortArray.setDisplayingView(dataGraphView);
+        dataGraphView.setData(sortArray);
+        sortArray.setDisplayingFragment(this);
 
         return layout;
     }
@@ -66,6 +64,42 @@ public class SortVisualisationFragment extends Fragment {
 
     public void startSorting() {
         sortArray.sort();
+    }
+
+    public void setAlgorithmName(final String name) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String baseText = getResources().getString(R.string.algorithm_name);
+                algorithmName.setText(String.format("%s %s", baseText, name));
+            }
+        });
+    }
+
+    public void setAlgorithmDelay(final int delay) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String baseText = getResources().getString(R.string.delay);
+                algorithmDelay.setText(String.format("%s %s", baseText, delay));
+            }
+        });
+    }
+
+    public void setSteps(final int steps) {
+        System.out.println("-------------");
+        //TODO: Problem with steps (Going distinct after a while)
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String baseText = getResources().getString(R.string.steps);
+                stepsText.setText(String.format("%s %s", baseText, steps));
+            }
+        });
+    }
+
+    public void invalidate() {
+        dataGraphView.invalidate();
     }
 
     public static SortVisualisationFragment getSortVisualisationFragmentInstance(int elementsCount, int sortAlgorithm) {
